@@ -31,3 +31,57 @@ exec DBMS_STATS.GATHER_DATABASE_STATS;
 OPTIMIZER_MODE = [RULE/CHOOSE/FIRST_ROWS/ALL_ROWS] 
 --- 4.2) Session Level
 alter session set optimizer_mode = [RULE/CHOOSE/FIRST_ROWS/ALL_ROWS] --ex) alter session set optimizer_mode = ALL_ROWS;
+--- 4.3) Statement Level
+select /*+first_rows*/
+  ename
+from emp;
+
+
+-- 5) 연습문제
+
+-- 제한조건
+--- 인덱스
+EC_TASK_PK : COURSE_CODE + TASK_NO
+EC_TASK_TERM_IDX00 : COURSE_CODE + TASK_NO + YEAR + COURSE_SQ_NO
+
+-- 쿼리문
+SELECT 
+  A.COURSE_CODE, 
+  A.TASK_NO, 
+  A.BBS_YN, 
+  A.UPDATE_DATE,
+  B.YEAR,
+  B.S_DATE,
+  B.E_DATE
+FROM 
+  EC_TASK A,
+  EC_TASK_TERM B
+WHERE 1=1
+  AND A.TASK_NO = B.COURSE_CODE
+  AND A.TASK_NO = B.TASK_NO
+  AND B.COURSE_CODE = 36
+  AND B.TASK_NO = 1
+  AND B.COURSE_SQ_NO = 1;
+
+--- 해설 : WHERE 절에 EC_TASK_TERM 컬럼에 대한 조건이 많기때문에 
+---       얼핏보기에는 EC_TASK_TERM 테이블을 Driving Table로 하여, 먼저 탐색할 것 같지만
+---       사실 YEAR에 대한 조건이 없기 때문에, EC_TASK_TERM는 다건 조회(PK가 전부 존재하지는 않음), EC_TASK는 단건 조회이다.(PK가 전부 조회)
+---       이 SQL은 그래서 RBO와 CBO가 다르고, 가독성역시 좋지 않다.
+---       따라서 아래와 같이 SQL을 수정할 필요가 있다.
+SELECT 
+  A.COURSE_CODE, 
+  A.TASK_NO, 
+  A.BBS_YN, 
+  A.UPDATE_DATE,
+  B.YEAR,
+  B.S_DATE,
+  B.E_DATE
+FROM 
+  EC_TASK A,
+  EC_TASK_TERM B
+WHERE 1=1
+  AND A.TASK_NO = B.COURSE_CODE
+  AND A.TASK_NO = B.TASK_NO
+  AND A.COURSE_CODE = 36         -- B.COURSE_COE ==> A.COURSE_CODE
+  AND A.TASK_NO = 1              -- B.TASK_NO    ==> A.TASK_NO
+  AND B.COURSE_SQ_NO = 1;

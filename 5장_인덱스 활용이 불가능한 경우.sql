@@ -49,3 +49,5 @@ FROM
 WHERE 1=1
   AND COURSE_CODE = 1960
   AND YEAR = '2002';
+  
+-- 4) ½Ç½À

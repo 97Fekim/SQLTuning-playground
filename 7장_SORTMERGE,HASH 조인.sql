@@ -57,3 +57,55 @@ WHERE 1=1
 ----  (조인을 수행하기에 메모리가 부족하다면 가장 큰 순서대로 Hash Bucket이 Temporary Tablespace로 내려가서 구성됨.
 ----   디스크로 내려간 Hash Bucket에 변경이 일어날 때마다 디스크 I/O가 발생하게 되어 성능이 현저하게 저하됨.
 ----   하드웨어 자원이 넉넉한 상황에서는 다른 조인에 비해 보다 효율적인 수행이 가능하지만, 부족한 상황에서는 오히려 다른 조인보다 느려질 수도 있음)
+
+
+-- 8) 실습
+( 테이블 정보 (1:N) )
+EC_COURSE_SQ : 과정차수정보  (약 20,000 ROWS)   -- 1
+EC_PROGRESS : 진도정보  (약 10,978,123 ROWS)    -- N
+
+(인덱스 정보)
+EC_COURSE_SQ_PK : COURSE_CODE + YEAR + COURSE_SQ_NO
+EC_PROGRESS_PK : COURSE_CODE + YEAR + COURSE_SQ_NO + MEMBER_TYPE + MEMBER_ID + CHAP_NO + PARAG_NO
+
+(수정전 쿼리문)
+SELECT /*+ USE_MERGE(A B)*/
+  B.COURSE_CODE,
+  B.YEAR,
+  B.COURSE_SQ_NO,
+  B.MEMBER_TYPE,
+  B.MEMBER_ID,
+  B.CHAP_NO,
+  B.PARAG_NO,
+  A.OPEN_YN,
+  A.END_YN
+FROM 
+  EC_COURSE_SQ A,
+  EC_PROGRESS B
+WHERE 1=1
+  AND A.COURSE_CODE = B.COURSE_CODE
+  AND A.YEAR = B.YEAR
+  AND A.COURSE_SQ_NO = B.COURSE_SQ_NO;
+  
+(해설)
+위의 수정전 쿼리문은 SORTED MERGE JOIN 방식을 이용하는데, 테이블 ROW COUNT의 불균형으로 인해 비효율적인 접근방식이 된다.
+따라서 HASH JOIN으로 변경함이 유리하다. (Driving Table은 여전히 ROW COUNT가 작은 EC_COURSE_SQ 테이블로 설정함이 바람직하다.)
+
+(수정후 쿼리문)
+SELECT /*+ USE_HASH(A B)*/
+  B.COURSE_CODE,
+  B.YEAR,
+  B.COURSE_SQ_NO,
+  B.MEMBER_TYPE,
+  B.MEMBER_ID,
+  B.CHAP_NO,
+  B.PARAG_NO,
+  A.OPEN_YN,
+  A.END_YN
+FROM 
+  EC_COURSE_SQ A,
+  EC_PROGRESS B
+WHERE 1=1
+  AND A.COURSE_CODE = B.COURSE_CODE
+  AND A.YEAR = B.YEAR
+  AND A.COURSE_SQ_NO = B.COURSE_SQ_NO;

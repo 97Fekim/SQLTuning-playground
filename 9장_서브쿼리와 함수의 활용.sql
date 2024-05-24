@@ -1,26 +1,26 @@
--- 1) SUB QUERYÀÇ Á¾·ù
---- 1.1) SELECT Àý¿¡ ¿À´Â SUB QUERY
---- 1.2) FROM Àý¿¡ ¿À´Â SUB QUERY (INLINE VIEW)
---- 1.3) WHERE Àý¿¡ ¿À´Â SUB QUERY (Correlated SubQuery, Nested SubQuery)
---- 1.4) ORDER BY Àý¿¡ ¿À´Â SUB QUERY
---- ¡Ø SUB QUERY´Â GROUP BY ÀýÀ» Á¦¿ÜÇÑ ¸ðµç Àý¿¡ »ç¿ëÀÌ °¡´ÉÇÏ´Ù.
+-- 1) SUB QUERYì˜ ì¢…ë¥˜
+--- 1.1) SELECT ì ˆì— ì˜¤ëŠ” SUB QUERY (Scalar Sub Query)
+--- 1.2) FROM ì ˆì— ì˜¤ëŠ” SUB QUERY (INLINE VIEW)
+--- 1.3) WHERE ì ˆì— ì˜¤ëŠ” SUB QUERY (Correlated SubQuery, Nested SubQuery)
+--- 1.4) ORDER BY ì ˆì— ì˜¤ëŠ” SUB QUERY
+--- â€» SUB QUERYëŠ” GROUP BY ì ˆì„ ì œì™¸í•œ ëª¨ë“  ì ˆì— ì‚¬ìš©ì´ ê°€ëŠ¥í•˜ë‹¤.
 
 
 -- 2) NESTED SUB QUERY
---- NESTED SUQ QUERY´Â WHERE ÀýÀÇ SUB QUERY°¡ ¸ÕÀú ½ÇÇàµÈ ÈÄ, MAIN QUERY°¡ ½ÇÇàµÇ´Â Äõ¸®ÀÇ µ¿ÀÛÀ» ¶æÇÑ´Ù.
-(¿¹Á¦)
+--- NESTED SUQ QUERYëŠ” WHERE ì ˆì˜ SUB QUERYê°€ ë¨¼ì € ì‹¤í–‰ëœ í›„, MAIN QUERYê°€ ì‹¤í–‰ë˜ëŠ” ì¿¼ë¦¬ì˜ ë™ìž‘ì„ ëœ»í•œë‹¤.
+(ì˜ˆì œ)
 SELECT EMPNO, ENAME
 FROM EMP
 WHERE DEPTNO = (SELECT DEPTNO
                 FROM DEPT
                 WHERE DNAME = 'SALES');
 
---- ¡Ø EMP Å×ÀÌºí¿¡ DEPTNOÀÇ ÀÎµ¦½º°¡ Á¸ÀçÇØ¾ß¸¸, WHEREÀýÀÇ SUB QUERY°¡ ¸ÕÀú ½ÇÇàµÈ ÈÄ MAIN QUERY°¡ ½ÇÇàµÈ´Ù.
+--- â€» EMP í…Œì´ë¸”ì— DEPTNOì˜ ì¸ë±ìŠ¤ê°€ ì¡´ìž¬í•´ì•¼ë§Œ, WHEREì ˆì˜ SUB QUERYê°€ ë¨¼ì € ì‹¤í–‰ëœ í›„ MAIN QUERYê°€ ì‹¤í–‰ëœë‹¤.
 
 
 -- 3) CORRELATED SUB QUERY
---- CORRELATED SUQ QUERY´Â MAIN QUERYÀÇ µ¿ÀÛ È½¼ö¸¸Å­, WHERE ÀýÀÇ SUB QUERY °¡ ½ÇÇàµÇ´Â Äõ¸®ÀÇ µ¿ÀÛÀ» ¶æÇÑ´Ù.
-(¿¹Á¦)
+--- CORRELATED SUQ QUERYëŠ” MAIN QUERYì˜ ë™ìž‘ íšŸìˆ˜ë§Œí¼, WHERE ì ˆì˜ SUB QUERY ê°€ ì‹¤í–‰ë˜ëŠ” ì¿¼ë¦¬ì˜ ë™ìž‘ì„ ëœ»í•œë‹¤.
+(ì˜ˆì œ)
 SELECT ENAME, EMPNO
 FROM EMP
 WHERE EXISTS (SELECT 'X' 
@@ -29,28 +29,28 @@ WHERE EXISTS (SELECT 'X'
               AND DEPT.DEPTNO = EMP.DEPTNO
               AND DEPT.DNAME = 'SALES')
 
---- ¡Ø EMP.DEPTNO¸¦ Á¶È¸ÇÏÁö ¾Ê°í´Â, SUB QUERY¸¦ ½ÇÇàÇÒ ¼ö ¾ø´Ù. µû¶ó¼­ À§ÀÇ ¿¹Á¦´Â MAIN QUERY°¡ ¸ÕÀú ½ÇÇàµÇ´Â CORRELATED SUB QUERYÀÌ´Ù.
+--- â€» EMP.DEPTNOë¥¼ ì¡°íšŒí•˜ì§€ ì•Šê³ ëŠ”, SUB QUERYë¥¼ ì‹¤í–‰í•  ìˆ˜ ì—†ë‹¤. ë”°ë¼ì„œ ìœ„ì˜ ì˜ˆì œëŠ” MAIN QUERYê°€ ë¨¼ì € ì‹¤í–‰ë˜ëŠ” CORRELATED SUB QUERYì´ë‹¤.
 
 
 -- 4) SCALAR SUB QUERY
---- ¡Ø SCALAR SUB QUERY ¶õ, ´Ü ÇÏ³ªÀÇ ROW¿Í ´Ü ÇÏ³ªÀÇ COLUMN ¸¸À» ¸®ÅÏÇÏ´Â SUB QUERY ÀÌ´Ù.
----    Áï Ã£´Â µ¥ÀÌÅÍ°¡ ¾ø´Ù¸é NULLÀ» ¸®ÅÏÇÏ¸ç, 
----    µÎ °³ ÀÌ»óÀÇ µ¥ÀÌÅÍ¸¦ ¸®ÅÏÇÏ°Ô µÈ´Ù¸é ERROR¸¦ ¹ß»ý½ÃÅ²´Ù.
-(¿¹Á¦)
-1. JOINÀ» È°¿ë
+--- â€» SCALAR SUB QUERY ëž€, ë‹¨ í•˜ë‚˜ì˜ ROWì™€ ë‹¨ í•˜ë‚˜ì˜ COLUMN ë§Œì„ ë¦¬í„´í•˜ëŠ” SUB QUERY ì´ë‹¤.
+---    ì¦‰ ì°¾ëŠ” ë°ì´í„°ê°€ ì—†ë‹¤ë©´ NULLì„ ë¦¬í„´í•˜ë©°, 
+---    ë‘ ê°œ ì´ìƒì˜ ë°ì´í„°ë¥¼ ë¦¬í„´í•˜ê²Œ ëœë‹¤ë©´ ERRORë¥¼ ë°œìƒì‹œí‚¨ë‹¤.
+(ì˜ˆì œ)
+1. JOINì„ í™œìš©
 SELECT E.ENAME, D.DNAME
 FROM EMP E, DEPT D
 WHERE E.DEPTNO = D.DEPTNO;
 
-2. SUB QUERY¸¦ È°¿ë
+2. SUB QUERYë¥¼ í™œìš©
 SELECT 
   E.ENAME,
   (SELECT D.DNAME             
-   FROM EMP E, DEPT D W      -- ÀÌ SUB QUERY ¿ª½Ã, ¿©·¯¹ø Á¶È¸µÇ¹Ç·Î ºñÈ¿À²ÀûÀÌ´Ù.
+   FROM EMP E, DEPT D W      -- ì´ SUB QUERY ì—­ì‹œ, ì—¬ëŸ¬ë²ˆ ì¡°íšŒë˜ë¯€ë¡œ ë¹„íš¨ìœ¨ì ì´ë‹¤.
    HERE E.DEPTNO = D.DEPTNO) AS DNAME
 WHERE EMP E;
 
-3. UDF(User Defined Function)·Î º¯È¯
+3. UDF(User Defined Function)ë¡œ ë³€í™˜
 CREATE OR REPLACE FUNCTION F_DNM(A_DNO IN DEPT.DEPTNO%TYPE)
 RETURN VARCHAR2
 RESULT_CACHE
@@ -92,7 +92,7 @@ YEAR               REGION           TOT
 1996                        200     200
 TOT         100     200     400     700
 
-(¿¹Á¦1) -- GROUP BY
+(ì˜ˆì œ1) -- GROUP BY
 SELECT D.DNAME, E.JOB
        COUNT(*) AS "Empl Cnt",
        SUM(E.SAL) AS "Tot Sal"
@@ -101,7 +101,7 @@ WHERE D.DEPTNO = E.DEPTNO
 GROUP BY D.DNAME, E.JOB
 ORDER BY 1,2;
 
-(¿¹Á¦1 Ãâ·Â) 
+(ì˜ˆì œ1 ì¶œë ¥) 
 DNAME          JOB         Tot Empl     Tot Sal
 ACCOUNTING     CLERK       1            1300
 ACCOUNTING     MANAGER     1            2450
@@ -113,7 +113,7 @@ SALES          CLERK       1            2850
 SALES          MANAGER     1            950
 SALES          SALESMAN    4            5600
 
-(¿¹Á¦2) -- ROLL UP
+(ì˜ˆì œ2) -- ROLL UP
 SELECT D.DNAME, E.JOB
        COUNT(*) AS "Empl Cnt",
        SUM(E.SAL) AS "Tot Sal"
@@ -122,7 +122,7 @@ WHERE D.DEPTNO = E.DEPTNO
 GROUP BY ROLLUP(D.DNAME, E.JOB)
 ORDER BY 1,2;
 
-(¿¹Á¦2 Ãâ·Â)  -- Ã¹¹øÂ° ARGUMENT, ÀüÃ¼ µ¥ÀÌÅÍ¿¡ ´ëÇØ Áý°è¸¦ ÇØÁØ´Ù.
+(ì˜ˆì œ2 ì¶œë ¥)  -- ì²«ë²ˆì§¸ ARGUMENT, ì „ì²´ ë°ì´í„°ì— ëŒ€í•´ ì§‘ê³„ë¥¼ í•´ì¤€ë‹¤.
 DNAME          JOB         Tot Empl     Tot Sal
 ACCOUNTING     CLERK       1            1300
 ACCOUNTING     MANAGER     1            2450
@@ -138,7 +138,7 @@ SALES          SALESMAN    4            5600
 SALES                      6            9400
                            14           21600
 
-(¿¹Á¦3) -- CUBE
+(ì˜ˆì œ3) -- CUBE
 SELECT D.DNAME, E.JOB
        COUNT(*) AS "Empl Cnt",
        SUM(E.SAL) AS "Tot Sal"
@@ -147,7 +147,7 @@ WHERE D.DEPTNO = E.DEPTNO
 GROUP BY ROLLUP(D.DNAME, E.JOB)
 ORDER BY 1,2;
 
-(¿¹Á¦2 Ãâ·Â) -- ¸ðµç ARGUMENT °¢°¢, ÀüÃ¼ µ¥ÀÌÅÍ¿¡ ´ëÇØ Áý°è¸¦ ÇØÁØ´Ù. 
+(ì˜ˆì œ2 ì¶œë ¥) -- ëª¨ë“  ARGUMENT ê°ê°, ì „ì²´ ë°ì´í„°ì— ëŒ€í•´ ì§‘ê³„ë¥¼ í•´ì¤€ë‹¤. 
 DNAME          JOB         Tot Empl     Tot Sal
 ACCOUNTING     CLERK       1            1300
 ACCOUNTING     MANAGER     1            2450
@@ -170,7 +170,7 @@ SALES                      6            9400
 
 -- 6) GROUPIN SETS()
 
-(¿¹Á¦1) -- GROUPIN SETS()À¸·Î ROLLUP ¸¸µé±â
+(ì˜ˆì œ1) -- GROUPIN SETS()ìœ¼ë¡œ ROLLUP ë§Œë“¤ê¸°
 SELECT D.DNAME, E.JOB
        COUNT(*) AS "Empl Cnt",
        SUM(E.SAL) AS "Tot Sal"
@@ -178,9 +178,9 @@ FROM DEPT D, EMP E
 WHERE D.DEPTNO = E.DEPTNO
 GROUP BY GROUPING SETS((D.DNAME, E.JOB), (D.DNAME), ())
 ORDER BY 1,2;
-==> ROLLUP°ú µ¿ÀÏ
+==> ROLLUPê³¼ ë™ì¼
 
-(¿¹Á¦2) -- GROUPING SETS()À¸·Î CUBE ¸¸µé±â
+(ì˜ˆì œ2) -- GROUPING SETS()ìœ¼ë¡œ CUBE ë§Œë“¤ê¸°
 SELECT D.DNAME, E.JOB
        COUNT(*) AS 'Empl Cnt',
        SUM(E.SAL) AS 'Tot Sal'
@@ -188,17 +188,17 @@ FROM DEPT D, EMP E
 WHERE D.DEPTNO = E.DEPTNO
 GROUP BY GROUPING SETS((D.DNAME, E.JOB), (D.DNAME), (E.JOB), ())
 ORDER BY 1,2;
-==> CUBE¿Í µ¿ÀÏ
+==> CUBEì™€ ë™ì¼
 
 
 -- 7) ANALYTICAL FUNCTIONS
 --- 7.1) SYNTAX
 SELECT ANALYTIC_FUNCTION (ARGUMENTS) OVER
-    ([PARTITION BY Ä®·³] [ORDER BY Àý] [WINDOWING Àý]
-FROM Å×ÀÌºí¸í .....  WHERE ....;
-¡Ø ARGUMENTS : ÇÔ¼ö¿¡ µû¶ó 0~3 °³ÀÇ ÀÎÀÚ°¡ ÁöÁ¤µÊ
-¡Ø PARTITION BY Àý : ÀüÃ¼ ÁýÇÕÀ» ±âÁØ¿¡ ÀÇÇØ ¼Ò±×·ìÀ¸·Î ³ª´®
-¡Ø ORDER BY Àý : ¾î¶² Ç×¸ñ¿¡ ´ëÇÑ Á¤·Ä ±âÁØÀ» ±â¼úÇÔ
-¡Ø WINDOWING Àý : ÇÔ¼ö¿¡ ÀÇÇØ¼­ Á¦¾îÇÏ°íÀÚ ÇÏ´Â µ¥ÀÌÅÍ ¹üÀ§¸¦ Á¤ÀÇÇÔ.
+    ([PARTITION BY ì¹¼ëŸ¼] [ORDER BY ì ˆ] [WINDOWING ì ˆ]
+FROM í…Œì´ë¸”ëª… .....  WHERE ....;
+â€» ARGUMENTS : í•¨ìˆ˜ì— ë”°ë¼ 0~3 ê°œì˜ ì¸ìžê°€ ì§€ì •ë¨
+â€» PARTITION BY ì ˆ : ì „ì²´ ì§‘í•©ì„ ê¸°ì¤€ì— ì˜í•´ ì†Œê·¸ë£¹ìœ¼ë¡œ ë‚˜ëˆ”
+â€» ORDER BY ì ˆ : ì–´ë–¤ í•­ëª©ì— ëŒ€í•œ ì •ë ¬ ê¸°ì¤€ì„ ê¸°ìˆ í•¨
+â€» WINDOWING ì ˆ : í•¨ìˆ˜ì— ì˜í•´ì„œ ì œì–´í•˜ê³ ìž í•˜ëŠ” ë°ì´í„° ë²”ìœ„ë¥¼ ì •ì˜í•¨.
 
 
